@@ -1,0 +1,22 @@
+{
+  "name": "exercicio_1",
+  "version": "1.0.0",
+  "description": "Ex. 1",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GustavoGontijoAntunes/node-js-pos.git"
+  },
+  "author": "Gustavo Gontijo Antunes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GustavoGontijoAntunes/node-js-pos/issues"
+  },
+  "homepage": "https://github.com/GustavoGontijoAntunes/node-js-pos#readme",
+  "dependencies": {
+    "express": "^4.17.3"
+  }
+}
