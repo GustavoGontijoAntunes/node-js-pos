@@ -8,7 +8,7 @@ export const getProduct = (req, res) => {
 
 export const getProductById = (req, res) => {
     const id = req.params.id;
-    const foundUser = products.find((product) => product.id === id);
+    const foundUser = products.find((product) => product.id == id);
 
     res.send(foundUser);
 };
@@ -33,7 +33,7 @@ export const deleteProduct = (req, res) => {
 export const updateProduct = (req, res) => {
     const id = req.params.id;
     const { descricao, valor, marca } = req.body;
-    const product = products.find((product) => product.id === id);
+    const product = products.find((product) => product.id == id);
 
     if(descricao){
         product.descricao = descricao;
