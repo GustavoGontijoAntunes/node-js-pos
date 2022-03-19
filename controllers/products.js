@@ -1,51 +1,82 @@
-import { v4 as uuidv4 } from 'uuid';
+var uuid = require('uuid');
 
-let products =  [];
-
-export const getProduct = (req, res) => {
-    res.send(products);
-};
-
-export const getProductById = (req, res) => {
-    const id = req.params.id;
-    const foundUser = products.find((product) => product.id == id);
-
-    res.send(foundUser);
-};
-
-export const createProduct = (req, res) => {
-    const product = req.body;
-    const productWithId = { ... product, id: uuidv4() };
-
-    products.push(productWithId);
-
-    res.send(`Postagem de dados realizada. O produto "${product.descricao}" foi adicionado no banco de dados.`);
-};
-
-export const deleteProduct = (req, res) => {
-    const id = req.params.id;
-
-    products = products.filter((product) => product.id != id);
-
-    res.send(`O produto de id ${id} foi deletado do banco de dados.`);
-};
-
-export const updateProduct = (req, res) => {
-    const id = req.params.id;
-    const { descricao, valor, marca } = req.body;
-    const product = products.find((product) => product.id == id);
-
-    if(descricao){
-        product.descricao = descricao;
+const knex = require('knex')({
+    client: 'pg',
+    debug: true,
+    connection: {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false },
     }
+});
 
-    if(valor){
-        product.valor = valor;
-    }
+exports.getProduct = (req, res) => {
+    knex.select('*')
+        .from('produto')
+        .then(produtos => {
+            res.status(200).send(produtos);
+        })
+};
 
-    if(marca){
-        product.marca = marca;
-    }
+exports.getProductById = (req, res) => {
+    knex.select('*')
+        .from('produto')
+        .where({
+            id: req.params.id
+        })
+        .then(produtos => {
+            if(produtos.length) {
+                res.status(200).send(produtos[0]);
+            }
+            else{
+                res.status(404).send({ message: 'Produto não encontrado.' });
+            }
+        })
+};
 
-    res.send(`O produto de id ${id} foi alterado no banco de dados.`);
+exports.createProduct = (req, res) => {
+    knex('produto')
+        .insert({ descricao: req.body.descricao, valor: req.body.valor, marca: req.body.marca }, ['id', 'descricao', 'valor', 'marca'])
+        .then(result => {
+            let novo_produto = result[0];
+            res.status(201).send({ message: 'Produto inserido com sucesso.', id: novo_produto.id })
+        })
+};
+
+exports.deleteProduct = (req, res) => {
+    knex('produto')
+        .where({
+            id: req.params.id
+        })
+        .del()
+        .then(d => {
+            if(d) {
+                res.status(200).send({ message: 'Produto excluído com sucesso.' });
+            }
+            else{
+                res.status(404).send({ message: 'Produto não encontrado para exclusão.' });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ message: 'Erro na exclusão.\nMensagem: ' + err.message });
+        })
+};
+
+exports.updateProduct = (req, res) => {
+    knex('produto')
+        .where({
+            id: req.params.id
+        })
+        .update({ descricao: req.body.descricao, valor: req.body.valor, marca: req.body.marca }, ['id', 'descricao', 'valor', 'marca'])
+        .then(u => {
+            let novo_produto = u[0];
+            if(u && novo_produto != null) {
+                res.status(201).send({ message: 'Produto alterado com sucesso.', id: novo_produto.id })                
+            }            
+            else{
+                res.status(404).send({ message: 'Produto não encontrado para exclusão.' });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({ message: 'Erro na alteração.\nMensagem: ' + err.message });
+        })
 };

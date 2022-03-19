@@ -1,13 +1,13 @@
-import express from 'express';
-import bodyParser from 'body-parser';
+require('dotenv').config();
 
-import productsRoutes from './routes/products.js';
-
-//const express = require('express');
+const express = require('express');
 const app = express();
+
+const productsRoutes = require('./routes/products.js');
+
 const port = process.env.PORT || 3000;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.use('/products', productsRoutes);
 
