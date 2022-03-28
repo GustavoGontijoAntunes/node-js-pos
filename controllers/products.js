@@ -1,4 +1,5 @@
 var uuid = require('uuid');
+const jwt = require('jsonwebtoken');
 
 const knex = require('knex')({
     client: 'pg',
